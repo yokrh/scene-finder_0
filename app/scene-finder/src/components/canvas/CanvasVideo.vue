@@ -1,15 +1,17 @@
 <template>
   <div class="canvas-video">
     <!-- select an video -->
-    Video
+    <div>Video</div>
     <input type="file" @change="updateVideoSrc">
-    <video style=""
-      :src="videoSrc"
-      @loadeddata="adjustVideoSize($event); updateCanvas($event);"
-    ></video>
 
-    <!-- display a video -->
-    <canvas :id="canvasId"></canvas>
+    <div v-show="videoSrc">
+      <video :src="videoSrc"
+        @loadeddata="adjustVideoSize($event); updateCanvas($event);"
+      ></video>
+
+      <!-- display a video -->
+      <canvas :id="canvasId"></canvas>
+    </div>
 
     <!-- load opencv.js -->
     <div :id="opencvjsParentTagId"></div>
@@ -31,12 +33,13 @@ export default {
       // opencv.js script tag's parent tag Id
       opencvjsParentTagId: 'opencv-script',
 
-      // canvas id
-      canvasId: '',
       // video source
       videoSrc: '',
-      // max video width
-      MAX_VIDEO_WITDH: 480,
+      // video width
+      VIDEO_WIDTH: 480,
+
+      // canvas id
+      canvasId: '',
     };
   },
   computed: {},
@@ -57,6 +60,23 @@ export default {
     },
 
     /**
+     * Adjust the video size.
+     */
+     adjustVideoSize(event) {
+      if (!event.target) return;
+
+      const videoElement = event.target;
+      const ratio = this.VIDEO_WIDTH / videoElement.videoWidth;
+      videoElement.width = ratio * videoElement.videoWidth;
+      videoElement.height = ratio * videoElement.videoHeight;
+
+      console.log(
+        `width: ${videoElement.videoWidth}->${videoElement.width},`,
+        `height: ${videoElement.videoHeight}->${videoElement.height}`
+      );
+    },
+
+    /**
      * Update the canvas.
      */
     updateCanvas(event) {
@@ -66,25 +86,9 @@ export default {
       const videoElement = event.target;
 
       const cv = new OpenCV(this.canvasId);
-      cv.vdshow(videoElement);
+      const option = { gray: true };
+      cv.vdshowFromElement(videoElement, option);
     },
-
-    /**
-     * Adjust the video size.
-     */
-    adjustVideoSize(event) {
-      if (!event.target) return;
-
-      const videoElement = event.target;
-      const ratio = this.MAX_VIDEO_WITDH / videoElement.videoWidth;
-      videoElement.width = ratio * videoElement.videoWidth;
-      videoElement.height = ratio * videoElement.videoHeight;
-
-      console.log(
-        `width: ${videoElement.videoWidth}->${videoElement.width},`,
-        `height: ${videoElement.videoHeight}->${videoElement.height}`
-      );
-    }
   },
 }
 </script>

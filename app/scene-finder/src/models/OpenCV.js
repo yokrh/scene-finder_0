@@ -10,6 +10,7 @@ export default class OpenCV {
   constructor(canvasId) {
     if (!canvasId) throw Error('no canvas id.');
 
+    // Canvas element id
     this.canvasId = canvasId;
   }
 
@@ -46,58 +47,117 @@ export default class OpenCV {
   }
 
   /**
+   * Get image mats from video.
+   */
+  static vdextractImageMats(videoElement,
+    option = { gray: false },
+    fps = 10,
+    maxFrame = 1 * 60 * 1000,
+    speed = 10
+  ){
+    videoElement.play();
+    videoElement.playbackRate = speed;
+    const cap = new cv.VideoCapture(videoElement);
+    const res = [];
+1
+    return new Promise((resolve) => {
+      console.log('cap start');
+      vdshowProcess(0)
+      .then(() => {
+        resolve(res);
+      });
+    });
+
+    // add image mat to res
+    function mainProcess() {
+      return new Promise((resolve) => {
+        const mat = new cv.Mat(videoElement.height, videoElement.width, cv.CV_8UC4);
+        cap.read(mat);
+        if (option.gray) cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
+        res.push(mat);
+        resolve();
+      }); 
+    }
+
+    function vdshowProcess(crrFrame) {
+      return new Promise((resolve) => {
+        // video end
+        if (videoElement.paused || crrFrame > maxFrame) {
+          console.log('cap end');
+          videoElement.pause();
+          resolve();
+          return;
+        }
+  
+        // add image mat to res
+        mainProcess()
+        .then(() => {
+          // next frame
+          const frameDiff = 1000/fps;
+          setTimeout(() => {
+            vdshowProcess(crrFrame + frameDiff)
+            .then(() => resolve());
+          }, frameDiff);
+        });
+      });
+    }
+  }
+
+  /**
+   * Show the image mat.
+   */
+  imshowFromMat(mat, option = { gray: false }, deleteFlg = true) {
+    if (option.gray) cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
+
+    cv.imshow(this.canvasId, mat);
+
+    if (deleteFlg) mat.delete();
+  }
+
+  /**
    * Show the image.
    */
-  imshow(imgElement) {
+  imshowFromElement(imgElement, option = { gray: false }) {
     const mat = cv.imread(imgElement);
-
-    cv.imshow(this.canvasId, mat);
-
-    mat.delete();
+    this.imshowFromMat(mat, option);
   }
 
   /**
-   * Show the gray scaled image.
+   * Show the video.
    */
-  imshowGray(imgElement) {
-    const mat = cv.imread(imgElement);
+  vdshowFromElement(videoElement,
+    option = { gray: false },
+    fps = 120,
+    maxFrame = 1 * 60 * 1000,
+    speed = 2
+    ){
 
-    cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY, 0);
-    cv.imshow(this.canvasId, mat);
-
-    mat.delete();
-  }
-
-  /**
-   * Process the video.
-   */
-  vdshow(videoElement, fps = 120, maxFrame = 1 * 60 * 1000) {
     videoElement.play();
-
+    videoElement.playbackRate = speed;
     const cap = new cv.VideoCapture(videoElement);
-    const src = new cv.Mat(videoElement.height, videoElement.width, cv.CV_8UC4);
-    const dst = new cv.Mat(videoElement.height, videoElement.width, cv.CV_8UC1);
 
     console.log('cap start');
     const self = this;
     vdshowProcess(0);
 
+    // show video frame image
+    function mainProcess() {
+      const mat = new cv.Mat(videoElement.height, videoElement.width, cv.CV_8UC4);
+      cap.read(mat);
+      self.imshowFromMat(mat, option);
+    }
+
     function vdshowProcess(crrFrame) {
       // video end
       if (videoElement.paused || crrFrame > maxFrame) {
         console.log('cap end');
-        src.delete();
-        dst.delete();
         videoElement.pause();
         return;
       }
-  
+
       // show video frame image
-      cap.read(src);
-      // cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY);
-      // cv.imshow(self.canvasId, dst);
-      cv.imshow(self.canvasId, src);
-      
+      mainProcess();
+
       // next frame
       const frameDiff = 1000/fps;
       setTimeout(() => {
@@ -105,5 +165,4 @@ export default class OpenCV {
       }, frameDiff);
     }
   }
-
 }

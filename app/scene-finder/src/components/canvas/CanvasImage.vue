@@ -1,17 +1,16 @@
 <template>
   <div class="canvas-image">
     <!-- select an image -->
-    Image
+    <div>Image</div>
     <input type="file" @change="updateImageSrc">
-    <img style="display:none;"
-      :src="imageSrc"
-      :width = "imageWidth"
-      :height = "imageHeight"
-      @load="updateCanvas"
-    >
 
-    <!-- display an image -->
-    <canvas :id="canvasId"></canvas>
+    <div v-show="imageSrc">
+      <img :src="imageSrc"
+        @load="adjustImageSize($event); updateCanvas($event);"
+      >
+      <!-- display an image -->
+      <canvas :id="canvasId"></canvas>
+    </div>
 
     <!-- load opencv.js -->
     <div :id="opencvjsParentTagId"></div>
@@ -33,14 +32,13 @@ export default {
       // opencv.js script tag's parent tag Id
       opencvjsParentTagId: 'opencv-script',
 
-      // canvas id
-      canvasId: '',
       // image source
       imageSrc: '',
-      // image height
-      imageHeight: 'auto',
       // image width
-      imageWidth: 480,
+      IMAGE_WIDTH: 400,
+
+      // canvas id
+      canvasId: '',
     };
   },
   computed: {},
@@ -61,6 +59,23 @@ export default {
     },
 
     /**
+     * Adjust the image size.
+     */
+     adjustImageSize(event) {
+      if (!event.target) return;
+
+      const imgElement = event.target;
+      const ratio = this.IMAGE_WIDTH / imgElement.width;
+      imgElement.width = ratio * imgElement.width;
+      // imgElement.height = ratio * imgElement.height;  // will be done automatically
+
+      console.log(
+        `width: ${imgElement.width / ratio}->${imgElement.width},`,
+        `height: ${imgElement.height / ratio}->${imgElement.height}`
+      );
+    },
+
+    /**
      * Update the canvas.
      */
     updateCanvas(event) {
@@ -70,7 +85,8 @@ export default {
       const imgElement = event.target;
 
       const cv = new OpenCV(this.canvasId);
-      cv.imshowGray(imgElement);
+      const option = { gray: true };
+      cv.imshowFromElement(imgElement, option);
     }
   },
 }
