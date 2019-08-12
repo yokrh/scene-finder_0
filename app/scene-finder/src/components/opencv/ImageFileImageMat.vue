@@ -5,7 +5,8 @@
 
     <!-- image preview -->
     <div v-if="showImage && imageSrc">
-      <img :src="imageSrc" @load="setImageMat($event);">
+      <img :src="imageSrc" @load="setImageMat($event);"
+        style="max-width:100%;">
     </div>
 
     <!-- load opencv.js -->

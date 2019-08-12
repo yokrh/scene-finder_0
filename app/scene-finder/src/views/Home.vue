@@ -1,22 +1,15 @@
 <template>
   <div class="home">
-    <CanvasImage />
-    <CanvasVideo />
-
-    <Canvas />
+    <VideoSceneFinder />
 </div>
 </template>
 
 <script>
-import CanvasImage from '@/components/canvas/CanvasImage.vue'
-import CanvasVideo from '@/components/canvas/CanvasVideo.vue'
-import Canvas from '@/components/Canvas.vue'
+import VideoSceneFinder from '@/components/VideoSceneFinder.vue'
 
 export default {
   components: {
-    CanvasImage,
-    CanvasVideo,
-    Canvas,
+    VideoSceneFinder,
   }
 }
 </script>

@@ -102,7 +102,7 @@ export default class OpenCV {
   static vdextractImageMats(
     videoElement,
     option = { gray: false },
-    fps = 1,  // unstable
+    fps = 2,  // unstable
     maxFrame = 1000,  // unstable
     speed = 10  // unstable
   ){
