@@ -2,91 +2,56 @@
   <div class="canvas-image">
     <!-- select an image -->
     <div>Image</div>
-    <input type="file" @change="updateImageSrc">
+    <ImageFileImageMat
+      v-model="mat"
+      :gray="gray"
+      style="display:inline-block;"
+    />
 
-    <div v-show="imageSrc">
-      <img :src="imageSrc"
-        @load="adjustImageSize($event); updateCanvas($event);"
-      >
-      <!-- display an image -->
+    <!-- display an image -->
+    <div v-show="mat" style="display:inline-block; margin-left:2%;">
       <canvas :id="canvasId"></canvas>
     </div>
-
-    <!-- load opencv.js -->
-    <div :id="opencvjsParentTagId"></div>
   </div>
 </template>
 
 <script>
 import OpenCV from '../../models/OpenCV.js';
+import ImageFileImageMat from '../opencv/ImageFileImageMat.vue'
 
 export default {
+  components: {
+    ImageFileImageMat,
+  },
   props: {
-    id: {
+    canvasId: {
       default: 'opencv-canvas-image',
       type: String,
     },
   },
   data() {
     return {
-      // opencv.js script tag's parent tag Id
-      opencvjsParentTagId: 'opencv-script',
-
-      // image source
-      imageSrc: '',
-      // image width
-      IMAGE_WIDTH: 400,
-
-      // canvas id
-      canvasId: '',
+      // mat in opencv
+      mat: null,
+      // to gray or not in opencv process
+      gray: false,
     };
   },
   computed: {},
-  mounted() {
-    this.canvasId = this.id;
-    OpenCV.loadOpenCVjs(this.opencvjsParentTagId);
+  watch: {
+    mat: function() { this.updateCanvas(); },
   },
+  mounted() {},
   methods: {
-    /**
-     * Update the canvas image src.
-     */
-    updateImageSrc(event) {
-      if (!event.target) return;
-      if (!event.target.files) return;
-      if (!event.target.files[0]) return;
-
-      this.imageSrc = URL.createObjectURL(event.target.files[0]);
-    },
-
-    /**
-     * Adjust the image size.
-     */
-     adjustImageSize(event) {
-      if (!event.target) return;
-
-      const imgElement = event.target;
-      const ratio = this.IMAGE_WIDTH / imgElement.width;
-      imgElement.width = ratio * imgElement.width;
-      // imgElement.height = ratio * imgElement.height;  // will be done automatically
-
-      console.log(
-        `width: ${imgElement.width / ratio}->${imgElement.width},`,
-        `height: ${imgElement.height / ratio}->${imgElement.height}`
-      );
-    },
-
     /**
      * Update the canvas.
      */
-    updateCanvas(event) {
+    updateCanvas() {
       if (!OpenCV.isOpenCVready()) return;
-      if (!event.target) return;
-
-      const imgElement = event.target;
 
       const cv = new OpenCV(this.canvasId);
       const option = { gray: true };
-      cv.imshowFromElement(imgElement, option);
+      cv.imshowFromMat(this.mat, option);
     }
   },
 }

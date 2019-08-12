@@ -1,10 +1,12 @@
 <template>
   <div class="canvas">
+    <div>Video scene finder</div>
+
     <!-- select an video -->
-    <div>Video</div>
-    <input type="file" @change="updateVideoSrc">
+    <input type="file" accept="video/*" @change="updateVideoSrc">
 
     <div v-show="videoSrc">
+      <!-- preview video -->
       <div style="display:flex; justify-content:center;">
         <video
           style="display:block;"
@@ -13,16 +15,29 @@
         ></video>
       </div>
 
-      <div>Canvas List</div>
-      <div v-if="!isProcessingExtractingImageMats && canvasImageMats.length > 0">
-        <input type="button" value="Show canvas list" @click="showCanvasList">
+      <div>
+        <div style="margin-top:24px;">Canvas List</div>
+
+        <!-- canvas list for video images-->
+        <div v-show="isShowingCanvasList"
+          style="margin-top:24px; padding:24px 2%; display:flex;
+            flex-wrap:nowrap; overflow-x:scroll; background-color:#0fafff22">
+          <span v-for="(canvasImageMat, index) in canvasImageMats"
+            :key="getCanvasIdFromIndex(index)"
+            style="margin:0 2%;">
+            <canvas :id="getCanvasIdFromIndex(index)"></canvas>
+            <span style="font-weight:bold;">[{{index}}]</span>
+            <span v-if="comparedImageSimilarities.length > 0">
+              {{comparedImageSimilarities[index]}}
+            </span>
+          </span>
+        </div>
+
+        <div v-if="isShowingCanvasList">
+          <div style="margin-top:24px;">Image Similarity</div>
+          <ImageFileImageMat v-model="comparedImageMat" />
+        </div>
       </div>
-      <!-- canvas list for video images-->
-      <canvas v-for="(canvasImageMat, index) in canvasImageMats"
-        :key="getCanvasIdFromIndex(index)"
-        :id="getCanvasIdFromIndex(index)"
-        style="width:30%; margin:8px 1%;">
-      </canvas>
     </div>
 
     <!-- load opencv.js -->
@@ -32,8 +47,12 @@
 
 <script>
 import OpenCV from '../models/OpenCV.js';
+import ImageFileImageMat from './opencv/ImageFileImageMat.vue'
 
 export default {
+  components: {
+    ImageFileImageMat,
+  },
   props: {
     id: {
       default: 'opencv-canvas-main',
@@ -55,11 +74,21 @@ export default {
       // canvas images
       canvasImageMats: [],
 
+      // compared image mat in opencv
+      comparedImageMat: null,
+      // similarity list between the compared image and canvas images
+      comparedImageSimilarities: [],
+
       // is processing
       isProcessingExtractingImageMats: false,
+      // is showing canvas list
+      isShowingCanvasList: false,
     };
   },
   computed: {},
+  watch: {
+    comparedImageMat: function() { this.calcImageSimilarity(); },
+  },
   mounted() {
     this.canvasIdPrefix = this.id;
     OpenCV.loadOpenCVjs(this.opencvjsParentTagId);
@@ -101,12 +130,18 @@ export default {
       if (!event.target) return;
 
       this.isProcessingExtractingImageMats = true;
+      this.isShowingCanvasList = false;
 
       const videoElement = event.target;
       OpenCV.vdextractImageMats(videoElement)
       .then(res => {
         this.canvasImageMats = res;
         this.isProcessingExtractingImageMats = false;
+
+        // wait for the canvas tags rendering.
+        setTimeout(() => {
+          this.showCanvasList();
+        }, 100);
       });
     },
 
@@ -117,7 +152,20 @@ export default {
       this.canvasImageMats.map((canvasImageMat, index) => {
         const canvasId = this.getCanvasIdFromIndex(index);
         const cvTmp = new OpenCV(canvasId);
-        cvTmp.imshowFromMat(canvasImageMat);
+        cvTmp.imshowFromMat(canvasImageMat, {}, false);
+      });
+      this.isShowingCanvasList = true;
+    },
+
+    /**
+     * Get Image Similarities
+     */
+    calcImageSimilarity() {
+      const a = this.comparedImageMat;
+      this.comparedImageSimilarities = this.canvasImageMats.map((canvasImageMat) => {
+        const b = canvasImageMat;
+        const similarity = OpenCV.calcImageSimilarity(a, b);
+        return similarity;
       });
     },
 

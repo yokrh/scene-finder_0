@@ -2,7 +2,7 @@
   <div class="canvas-video">
     <!-- select an video -->
     <div>Video</div>
-    <input type="file" @change="updateVideoSrc">
+    <input type="file" accept="video/*" @change="updateVideoSrc">
 
     <div v-show="videoSrc">
       <video :src="videoSrc"
