@@ -10,8 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-serverless-express": "^3.3.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "ytdl-core": "^0.29.5"
+  },
+  "devDependencies": {
+    "serverless-offline": "^5.10.1",
+    "serverless-domain-manager": "^3.3.0"
   }
 }
