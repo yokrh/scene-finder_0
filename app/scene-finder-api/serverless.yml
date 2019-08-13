@@ -12,11 +12,14 @@ plugins:
   - serverless-domain-manager
 
 custom:
+  domains:
+    prod: api.yokrh.com
+    beta: api-beta.yokrh.com
   customDomain:
-    domainName: 'api-${self:provider.stage}.yokrh.com'
+    domainName: ${self:custom.domains.${self:provider.stage}}
     certificateName: '*.yokrh.com'
     stage: ${self:provider.stage}
-    basePath: 'scene-finder'
+    basePath: ''
     createRoute53Record: false  # Default: true.
     #Creating a new Route53 record in other account is not supported.
     #Should add A record with alias manually from https://console.aws.amazon.com/route53/home#hosted-zones:
@@ -25,13 +28,19 @@ custom:
 functions:
   fc-index:
     handler: index.handler
-    events:  # should be same as express router
+    events:  # should be same as express router. or use catch-all path (=wildcard)
       - http:
           method: options
-          path: /{any+}  # wildcard
+          path: /{proxy+}  # catch-all path
       - http:
           method: get
-          path: /health
-      - http:
-          method: get
-          path: /store/{proxy+}  # for /ytdl/download. Only 1 depth is allowed.
+          path: /{proxy+}  # catch-all path
+      # - http:
+      #     method: get
+      #     path: /health
+      # - http:
+      #     method: get
+      #     path: /ytdl/download  # It's not working with custom domain base mapping
+      # - http:
+      #     method: get
+      #     path: /ytdl/{proxy+}  # for /ytdl/download. It's not working with custom domain base mapping

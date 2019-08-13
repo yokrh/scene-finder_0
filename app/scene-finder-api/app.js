@@ -48,9 +48,9 @@ router.get('/ytdl/download', cors(), (req, res) => {
 app.use('/', router);
 
 // Let aws-serverless-express to create a server
-// const server = app.listen(3000, () => {
-//   console.log("Expressjs port:", server.address().port);
-// });
+const server = app.listen(3000, () => {
+  console.log("Expressjs port:", server.address().port);
+});
 
 // Export your express server so you can import it in the lambda function.
 module.exports = app

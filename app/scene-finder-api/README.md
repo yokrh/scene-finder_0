@@ -1,6 +1,8 @@
 # Scene finder api
 
-Dev memo
+Dev memo.
+At last I realized the response size limit of lambda and deleted it...
+https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/limits.html
 
 
 ## aws-serverless-express
@@ -12,14 +14,13 @@ npm install --save aws-serverless-express
 ```
 
 
-## Serverless
+## serverless
 
 https://github.com/serverless/serverless
-https://stackoverflow.com/questions/52251075/how-to-pass-parameters-to-serverless-invoke-local
 
-### setup
+### Setup
 
-1. install
+1. Install
 
     ```sh
     # install
@@ -29,7 +30,7 @@ https://stackoverflow.com/questions/52251075/how-to-pass-parameters-to-serverles
     serverless --version
     ```
 
-2. configure credentials
+2. Configure credentials
 
     https://github.com/serverless/serverless/blob/master/docs/providers/aws/guide/credentials.md#using-aws-profiles
 
@@ -55,35 +56,33 @@ https://stackoverflow.com/questions/52251075/how-to-pass-parameters-to-serverles
         less ~/.aws/credentials
         ```
 
-### plugin
+### Plugin
 
 * Serverless offline
 
-https://www.npmjs.com/package/serverless-offline
+    https://www.npmjs.com/package/serverless-offline
 
-```sh
-# install
-npm i -D serverless-offline
-```
+    ```sh
+    # install
+    npm i -D serverless-offline
+    ```
 
 * Serverless domain manager
 
-https://github.com/amplify-education/serverless-domain-manager
-https://serverless.com/blog/serverless-api-gateway-domain/
-https://qiita.com/koshilife/items/bb7edb12f0285a241294
+    https://github.com/amplify-education/serverless-domain-manager
 
-```sh
-# install
-npm i -D serverless-domain-manager
-```
+    ```sh
+    # install
+    npm i -D serverless-domain-manager
+    ```
 
 ### Usage
 
-0. prepare serverless.yml
+0. Prepare serverless.yml
 
     See /app/scene-finder/serverless.yml.
 
-1. local check
+1. Local check
 
     ```sh
     # run the local server with serverless-cli. Instead of running "node app.js"
@@ -94,7 +93,7 @@ npm i -D serverless-domain-manager
     #serverless invoke local -f fc-index -l  # it seems only for root path
     ```
 
-2. deploy
+2. Deploy
 
     ```sh
     # create the custom domain
@@ -111,27 +110,51 @@ npm i -D serverless-domain-manager
     # Wait few mins.
     ```
 
-3. check
-
     ```sh
+    # check
     sls info
     sls deploy list functions
     #curl https://example.com/health
 
     # invoke the lambda function
     #serverless invoke -f fc-index -l  # it seems only for root path
+    
+    # logs
+    sls logs -f fc-index
     ```
 
-4. destroy
+3. Configure base mapping in the custom domain
+
+    https://ap-northeast-1.console.aws.amazon.com/apigateway/home?region=ap-northeast-1#/custom-domain-names
+
+    * '/{proxy+}' as API gateway path, and '/' as custom domain base mapping.
+        * All works.
+        * Only one api (other api will not be able to use custom domain)
+
+    * '/{proxy+}' as API gateway path, and '/ytdl' as custom domain
+        * /health not works
+        * /ytdl/download works
+
+    * '/health' as API gateway path, and '/health' as custom domain
+        * /health works
+        * /ytdl/download not works
+
+4. Destroy
 
     ```sh
     sls remove
     sls delete_domain
+    # + delete an A record in Route53
     ```
 
 
 ## Others
 
-Thanks
+### Thanks
+
 https://medium.com/@kiesp/how-to-create-a-simple-api-using-lambda-and-api-gateway-part-1-4bde8e49939
+
+https://serverless.com/blog/serverless-api-gateway-domain/
+
+https://qiita.com/koshilife/items/bb7edb12f0285a241294
 

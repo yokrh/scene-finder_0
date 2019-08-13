@@ -105,7 +105,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/scene-finder/beta/1565703273224-2019-08-13T13:34:33.224Z/scene-finder.zip"
+          "S3Key": "serverless/scene-finder/beta/1565709289063-2019-08-13T15:14:49.063Z/scene-finder.zip"
         },
         "FunctionName": "scene-finder-beta-fc-index",
         "Handler": "index.handler",
@@ -124,14 +124,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "FcDashindexLambdaVersionfxoKEkXQNcWTKIUt6EJNQeCJTiCOB2K74hiO3ZX0Zm0": {
+    "FcDashindexLambdaVersionHXNRwxk1tqQzTb451YC8x4TqJunDw0axR7rllkdpOo": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "FcDashindexLambdaFunction"
         },
-        "CodeSha256": "kSUsD8JrdvXivfT5SZbnBbQcbkOReGZbdCC3vY4Vgk8="
+        "CodeSha256": "VwBP4fPS4TXmZi3hdt0doWZHNpG0s2P/yY5sTMzvQh8="
       }
     },
     "ApiGatewayRestApi": {
@@ -145,7 +145,7 @@
         }
       }
     },
-    "ApiGatewayResourceAnyVar": {
+    "ApiGatewayResourceProxyVar": {
       "Type": "AWS::ApiGateway::Resource",
       "Properties": {
         "ParentId": {
@@ -153,48 +153,6 @@
             "ApiGatewayRestApi",
             "RootResourceId"
           ]
-        },
-        "PathPart": "{any+}",
-        "RestApiId": {
-          "Ref": "ApiGatewayRestApi"
-        }
-      }
-    },
-    "ApiGatewayResourceHealth": {
-      "Type": "AWS::ApiGateway::Resource",
-      "Properties": {
-        "ParentId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
-        },
-        "PathPart": "health",
-        "RestApiId": {
-          "Ref": "ApiGatewayRestApi"
-        }
-      }
-    },
-    "ApiGatewayResourceStore": {
-      "Type": "AWS::ApiGateway::Resource",
-      "Properties": {
-        "ParentId": {
-          "Fn::GetAtt": [
-            "ApiGatewayRestApi",
-            "RootResourceId"
-          ]
-        },
-        "PathPart": "store",
-        "RestApiId": {
-          "Ref": "ApiGatewayRestApi"
-        }
-      }
-    },
-    "ApiGatewayResourceStoreProxyVar": {
-      "Type": "AWS::ApiGateway::Resource",
-      "Properties": {
-        "ParentId": {
-          "Ref": "ApiGatewayResourceStore"
         },
         "PathPart": "{proxy+}",
         "RestApiId": {
@@ -202,13 +160,13 @@
         }
       }
     },
-    "ApiGatewayMethodAnyVarOptions": {
+    "ApiGatewayMethodProxyVarOptions": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "HttpMethod": "OPTIONS",
         "RequestParameters": {},
         "ResourceId": {
-          "Ref": "ApiGatewayResourceAnyVar"
+          "Ref": "ApiGatewayResourceProxyVar"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -245,13 +203,13 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayMethodHealthGet": {
+    "ApiGatewayMethodProxyVarGet": {
       "Type": "AWS::ApiGateway::Method",
       "Properties": {
         "HttpMethod": "GET",
         "RequestParameters": {},
         "ResourceId": {
-          "Ref": "ApiGatewayResourceHealth"
+          "Ref": "ApiGatewayResourceProxyVar"
         },
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
@@ -288,50 +246,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayMethodStoreProxyVarGet": {
-      "Type": "AWS::ApiGateway::Method",
-      "Properties": {
-        "HttpMethod": "GET",
-        "RequestParameters": {},
-        "ResourceId": {
-          "Ref": "ApiGatewayResourceStoreProxyVar"
-        },
-        "RestApiId": {
-          "Ref": "ApiGatewayRestApi"
-        },
-        "ApiKeyRequired": false,
-        "AuthorizationType": "NONE",
-        "Integration": {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition"
-                },
-                ":apigateway:",
-                {
-                  "Ref": "AWS::Region"
-                },
-                ":lambda:path/2015-03-31/functions/",
-                {
-                  "Fn::GetAtt": [
-                    "FcDashindexLambdaFunction",
-                    "Arn"
-                  ]
-                },
-                "/invocations"
-              ]
-            ]
-          }
-        },
-        "MethodResponses": []
-      }
-    },
-    "ApiGatewayDeployment1565703264246": {
+    "ApiGatewayDeployment1565709281113": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -340,9 +255,8 @@
         "StageName": "beta"
       },
       "DependsOn": [
-        "ApiGatewayMethodAnyVarOptions",
-        "ApiGatewayMethodHealthGet",
-        "ApiGatewayMethodStoreProxyVarGet"
+        "ApiGatewayMethodProxyVarOptions",
+        "ApiGatewayMethodProxyVarGet"
       ]
     },
     "FcDashindexLambdaPermissionApiGateway": {
@@ -392,7 +306,7 @@
     "FcDashindexLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "FcDashindexLambdaVersionfxoKEkXQNcWTKIUt6EJNQeCJTiCOB2K74hiO3ZX0Zm0"
+        "Ref": "FcDashindexLambdaVersionHXNRwxk1tqQzTb451YC8x4TqJunDw0axR7rllkdpOo"
       }
     },
     "ServiceEndpoint": {
