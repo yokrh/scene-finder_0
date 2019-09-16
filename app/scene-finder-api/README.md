@@ -20,17 +20,17 @@ https://github.com/serverless/serverless
 
 ### Setup
 
-1. Install
+1. Install serverless
 
     ```sh
     # install
-    npm install serverless -g
+    npm install serverless -g  # or 'npm i -D' and using npx later
 
     # check serverless-cli is installed
     serverless --version
     ```
 
-2. Configure credentials
+2. Configure AWS credentials
 
     https://github.com/serverless/serverless/blob/master/docs/providers/aws/guide/credentials.md#using-aws-profiles
 
@@ -41,6 +41,7 @@ https://github.com/serverless/serverless
 
     2. Use aws-cli to configure aws credentials
 
+        https://docs.aws.amazon.com/cli/latest/userguide/install-macos.html
         https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration-multi-profiles
 
         ```sh
@@ -49,11 +50,12 @@ https://github.com/serverless/serverless
 
         # configure credentials
         aws configure --profile scene-finder
-        # xxxxxxxx
-        # xxxxxxxxxxxxxxxx
+        # xxxxxxxx  # new IAM user's one
+        # xxxxxxxxxxxxxxxx  # new IAM user's one
         # ap-northeast-1
         # txt
         less ~/.aws/credentials
+        aws s3 ls --profile=scene-finder
         ```
 
 ### Plugin
@@ -64,7 +66,7 @@ https://github.com/serverless/serverless
 
     ```sh
     # install
-    npm i -D serverless-offline
+    npm i -g serverless-offline  # or 'npm i -D' and using npx later
     ```
 
 * Serverless domain manager
@@ -73,14 +75,14 @@ https://github.com/serverless/serverless
 
     ```sh
     # install
-    npm i -D serverless-domain-manager
+    npm i -g serverless-domain-manager  # or 'npm i -D' and using npx later
     ```
 
 ### Usage
 
 0. Prepare serverless.yml
 
-    See /app/scene-finder/serverless.yml.
+    See /app/scene-finder-api/serverless.yml.
 
 1. Local check
 

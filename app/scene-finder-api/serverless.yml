@@ -17,7 +17,7 @@ custom:
     beta: api-beta.yokrh.com
   customDomain:
     domainName: ${self:custom.domains.${self:provider.stage}}
-    certificateName: '*.yokrh.com'
+    certificateName: '*.yokrh.com'  # Note: may not be a multi-level wildcard SSL certificate (* is only for one level)
     stage: ${self:provider.stage}
     basePath: ''
     createRoute53Record: false  # Default: true.
