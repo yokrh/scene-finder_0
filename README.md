@@ -2,6 +2,8 @@
 
 It can find the scene of an image in a video.
 
+Only work on local. (Failed to use lambda)
+
 
 ## Prerequisite
 
@@ -42,4 +44,8 @@ npm run dev
 ```
 
 Access to http://localhost:8080/about/. Input youtube url and download it.
+
+
+後身
+https://github.com/yokrh/scene-finder_0
 
