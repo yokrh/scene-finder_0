@@ -51,5 +51,5 @@ Access to http://localhost:8080/about/. Input youtube url and download it.
 aws-serverless-express serverless with custom domain: Failed because the video response exceeds the size limit of lambda. => Need going through S3
 
 後身
-https://github.com/yokrh/scene-finder_0
+https://github.com/yokrh/scene-finder_1
 
